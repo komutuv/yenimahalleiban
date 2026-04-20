@@ -1,1 +1,197 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IBAN</title>
 
+<style>
+body{
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+background:#0b1220;
+color:#fff;
+margin:0;
+}
+
+.wrap{
+max-width:520px;
+margin:0 auto;
+padding:22px;
+}
+
+.card{
+background:#111b31;
+border:1px solid rgba(255,255,255,.12);
+border-radius:18px;
+padding:18px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+h1{
+font-size:20px;
+margin:0 0 10px;
+}
+
+.label{
+font-size:12px;
+opacity:.75;
+margin-top:14px;
+}
+
+.value{
+font-size:16px;
+font-weight:700;
+line-height:1.35;
+word-break:break-word;
+}
+
+.ibanBox{
+margin-top:10px;
+padding:14px;
+background:#0b1220;
+border:1px dashed rgba(255,255,255,.25);
+border-radius:14px;
+}
+
+.btns{
+display:flex;
+gap:10px;
+margin-top:14px;
+flex-wrap:wrap;
+}
+
+button,a.btn{
+appearance:none;
+border:0;
+cursor:pointer;
+padding:12px 14px;
+border-radius:14px;
+font-weight:700;
+text-decoration:none;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.primary{
+background:#e11d48;
+color:#fff;
+}
+
+.secondary{
+background:rgba(255,255,255,.12);
+color:#fff;
+border:1px solid rgba(255,255,255,.18);
+}
+
+.note{
+margin-top:12px;
+font-size:12px;
+opacity:.75;
+}
+
+.toast{
+margin-top:10px;
+font-size:13px;
+color:#a7f3d0;
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+<div class="card">
+
+<h1>Ödeme Bilgileri</h1>
+
+<div class="label">Banka</div>
+<div class="value" id="bank">Ziraat Bankası - Lalegül Şubesi</div>
+
+<div class="label">Alıcı</div>
+<div class="value" id="name">Yenimahalle Halk Eğitimi Merkezi Akşamsanat Okulu Aile Birliği</div>
+
+<div class="label">IBAN</div>
+
+<div class="ibanBox">
+<div class="value" id="ibanPretty">TR38 0001 0015 7735 3958 8550 04</div>
+</div>
+
+<div class="btns">
+<button class="primary" id="copyBtn">IBAN Kopyala</button>
+<button class="secondary" id="shareBtn">Paylaş</button>
+<a class="btn secondary" id="whatsBtn" target="_blank">WhatsApp</a>
+</div>
+
+<div class="toast" id="toast">Kopyalandı ✅</div>
+
+<div class="note">
+Not: Paylaş özelliği bazı cihazlarda görünmeyebilir.
+</div>
+
+</div>
+</div>
+
+<script>
+
+const ibanPretty="TR38 0001 0015 7735 3958 8550 04";
+const ibanPlain="TR380001001577353958855004";
+const bank="Ziraat Bankası - Lalegül Şubesi";
+const name="Yenimahalle Halk Eğitimi Merkezi Akşamsanat Okulu Aile Birliği";
+
+document.getElementById("bank").textContent=bank;
+document.getElementById("name").textContent=name;
+document.getElementById("ibanPretty").textContent=ibanPretty;
+
+const toast=document.getElementById("toast");
+
+function showToast(){
+toast.style.display="block";
+clearTimeout(window.__t);
+window.__t=setTimeout(()=>toast.style.display="none",1500);
+}
+
+document.getElementById("copyBtn").addEventListener("click",async()=>{
+try{
+await navigator.clipboard.writeText(ibanPlain);
+showToast();
+}catch{
+const ta=document.createElement("textarea");
+ta.value=ibanPlain;
+document.body.appendChild(ta);
+ta.select();
+document.execCommand("copy");
+document.body.removeChild(ta);
+showToast();
+}
+});
+
+document.getElementById("shareBtn").addEventListener("click",async()=>{
+
+const text=`Banka: ${bank}
+Alıcı: ${name}
+IBAN: ${ibanPretty}`;
+
+if(navigator.share){
+try{
+await navigator.share({title:"Ödeme Bilgileri",text});
+}catch{}
+}else{
+await navigator.clipboard.writeText(text);
+showToast();
+}
+});
+
+const waText=encodeURIComponent(
+`Banka: ${bank}
+Alıcı: ${name}
+IBAN: ${ibanPretty}`
+);
+
+document.getElementById("whatsBtn").href=`https://wa.me/?text=${waText}`;
+
+</script>
+
+</body>
+</html>
